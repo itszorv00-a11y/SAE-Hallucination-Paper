@@ -26,7 +26,8 @@ def mean_logprob(model, text: str) -> float:
 def main():
     model = load_model()
     sae = load_sae(LAYER, WIDTH, L0)
-    known_latent_idx = 0  # TODO: paper's known-entity latent
+    from latent_indices import KNOWN_LATENT
+    known_latent_idx = KNOWN_LATENT
     direction = sae.W_dec.data[known_latent_idx]
     unknown_prompts = [p for kind, name, p in all_prompts() if kind == "unknown"]
     mean_norm = mean_residual_norm(model, unknown_prompts, LAYER)

@@ -4,6 +4,13 @@ Code for the fixes tracked in `REVIEW_AND_FIX_PLAN.md`. Everything runs on a sin
 GPU (e.g., molab RTX Pro 6000, 96 GB) with `google/gemma-2-2b-it` (accept the Gemma
 license on HuggingFace first; set `HF_TOKEN`).
 
+## Setup (Colab — easiest)
+
+Open `colab_runner.ipynb` in Google Colab (File > Upload notebook), select T4 GPU,
+and run cells top to bottom. The notebook clones this repo automatically and walks
+through every experiment. Note: Gemma is a gated model — accept the license on
+HuggingFace and set `HF_TOKEN` in Colab secrets.
+
 ## Setup (molab)
 
 ```bash

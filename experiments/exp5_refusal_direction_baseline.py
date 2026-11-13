@@ -14,12 +14,10 @@ from entities import all_prompts
 LAYER = 12
 ALPHAS = [0.25, 0.5, 1.0]
 
-HARMFUL = [
-    # TODO: ~30 harmful requests (e.g., from jailbreakbench-style public lists)
-]
-HARMLESS = [
-    # TODO: ~30 matched harmless requests
-]
+try:
+    from harmful_harmless import HARMFUL, HARMLESS
+except ImportError:
+    raise SystemExit("Fill harmful_harmless.py first (see Colab runner cell)")
 
 
 def diff_in_means_direction(model, layer: int) -> torch.Tensor:

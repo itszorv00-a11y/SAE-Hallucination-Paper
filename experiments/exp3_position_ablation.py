@@ -17,8 +17,8 @@ POSITIONS = ["final_entity", "first", "all_tokens"]
 def main():
     model = load_model()
     sae = load_sae(LAYER, WIDTH, L0)
-    # TODO: replace with the paper's selected unknown-entity latent index
-    unknown_latent_idx = 0
+    from latent_indices import UNKNOWN_LATENT
+    unknown_latent_idx = UNKNOWN_LATENT
     direction = sae.W_dec.data[unknown_latent_idx]
     known_prompts = [p for kind, name, p in all_prompts() if kind == "known"]
     mean_norm = mean_residual_norm(model, known_prompts, LAYER)
