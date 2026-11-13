@@ -8,7 +8,7 @@ ORCID: 0009-0003-1021-685X | Email: 20mahin2020@gmail.com | GitHub: MD-Mushfiqur
 
 ## Abstract
 
-Sparse Autoencoders (SAEs) have emerged as a leading instrument for resolving polysemanticity in transformer language models, offering dictionaries of monosemantic latents. Recent work (Ferrando et al., 2025) demonstrated that JumpReLU SAEs trained on Gemma-2 identify localized latents that classify known versus unknown entities, and reported that surgical intervention on these latents causally modulates epistemic refusal and hallucination. In this work, we present an exhaustive empirical and theoretical evaluation of this claim across 8 architectural configurations of Gemma Scope SAEs on google/gemma-2-2b-it. First, to address surface-level syntax confounds, we introduce **Chimera Entities** (hybrid constructs combining authentic entity tokens into fictitious names), establishing that SAE detection reflects genuine epistemic familiarity (mean activation 3.92, 57% firing) rather than orthographic or tokenization artifacts. Second, introducing Norm-Matched Causal Steering across four relative scales (10%, 25%, 50%, and 100% of residual norm), we uncover a pronounced **Asymmetric Control Failure**: steering with unknown-entity latents on known factual queries fails to induce refusal in 0/30 (0.0%) of evaluations across all widths, layers, and norm multipliers up to 100% residual magnitude; multi-latent sweeps up to k=10 simultaneously still yield 0/30. Conversely, suppressing refusal on unknown entities requires extreme norm-matched perturbation (100% norm), which fails Holm-Bonferroni corrected significance (p_adj > 0.05) and causes catastrophic generation collapse. Third, scaling dictionary width from 16k to 65k induces pervasive feature splitting (cosine < 0.40), yet the causal nullity remains invariant. Fourth, training custom multi-seed SAEs (M=8192, seeds {42, 1337, 2026}) yields near-chance Hungarian alignment (mean cosine 0.0787, 0.0% overlap at cosine >= 0.70), confirming and extending the seed-dependence reported by Paulo & Belrose (2025) to epistemic latents. Our findings indicate that high classification AUROC (> 0.96) is decoupled from causal intervention efficacy: **Detection != Control**.
+Sparse Autoencoders (SAEs) have emerged as a leading instrument for resolving polysemanticity in transformer language models, offering dictionaries of monosemantic latents. Recent work (Ferrando et al., 2025) demonstrated that JumpReLU SAEs trained on Gemma-2 identify localized latents that classify known versus unknown entities, and reported that surgical intervention on these latents causally modulates epistemic refusal and hallucination. In this work, we present a systematic empirical and theoretical evaluation of this claim across 8 architectural configurations of Gemma Scope SAEs on google/gemma-2-2b-it. First, to address surface-level syntax confounds, we introduce **Chimera Entities** (hybrid constructs combining authentic entity tokens into fictitious names), establishing that SAE detection reflects genuine epistemic familiarity (mean activation 3.92, 57% firing) rather than orthographic or tokenization artifacts. Second, introducing Norm-Matched Causal Steering across four relative scales (10%, 25%, 50%, and 100% of residual norm), we uncover a pronounced **Asymmetric Control Failure**: steering with unknown-entity latents on known factual queries fails to induce refusal in 0/30 (0.0%; 95% CI 0–11.6%) of evaluations across all widths, layers, and norm multipliers up to 100% residual magnitude; multi-latent sweeps up to k=10 simultaneously still yield 0/30. Conversely, suppressing refusal on unknown entities requires extreme norm-matched perturbation (100% norm), which fails Holm-Bonferroni corrected significance (p_adj > 0.05) and causes catastrophic generation collapse. Third, scaling dictionary width from 16k to 65k induces pervasive feature splitting (cosine < 0.40), yet the causal nullity remains invariant. Fourth, training custom multi-seed SAEs (M=8192, seeds {42, 1337, 2026}) yields near-chance Hungarian alignment (mean cosine 0.0787, 0.0% overlap at cosine >= 0.70), confirming and extending the seed-dependence reported by Paulo & Belrose (2025) to epistemic latents. Our findings indicate that high classification AUROC (> 0.96) is decoupled from causal intervention efficacy: **Detection != Control**.
 
 ## 1. Introduction
 
@@ -20,7 +20,7 @@ We emphasize that epistemic refusal and hallucination are two sides of the same 
 
 We evaluated 8 JumpReLU SAE configurations from Gemma Scope (Lieberum et al., 2024) across Layers 9, 12, 16, widths 16k and 65k, and target L0 in {30, 80, 200} on google/gemma-2-2b-it.
 
-**Steering protocol.** Interventions add the SAE decoder direction of a selected latent (scaled by alpha relative to the mean residual-stream norm at the intervention layer) to the residual stream at the final entity token. Latents were selected as the top unknown-/known-entity latents by minimum separation score following Ferrando et al. (2025). Refusal was scored by string matching refusal-marker phrases in the model response (e.g., "I cannot", "I don't have information"), consistent with prior work; full lists and code are provided in the repository.
+**Steering protocol.** Interventions add the SAE decoder direction of a selected latent (scaled by alpha relative to the mean residual-stream norm at the intervention layer) to the residual stream at the final entity token. Latents were selected as the top unknown-/known-entity latents by minimum separation score following Ferrando et al. (2025). Refusal was scored by string matching refusal-marker phrases in the model response (e.g., "I cannot", "I don't have information"), consistent with prior work; the full stimulus lists are provided in Appendix A, and the analysis code will be released upon publication.
 
 **Chimera Entities.** To rigorously disentangle genuine epistemic tracking from tokenization-frequency artifacts, we introduced Chimera Entities: fictitious athletes created by pairing authentic first names with authentic surnames of different athletes (e.g., Kobe Williams, Novak Zidane, Stephen Ronaldo). Every constituent token is high-frequency, natural, and semantically grounded, yet the entity does not exist. The full 90-entity stimulus lists (30 known, 30 chimera, 30 synthetic unknown) are given in Appendix A.
 
@@ -42,7 +42,7 @@ We evaluated 8 JumpReLU SAE configurations from Gemma Scope (Lieberum et al., 20
 
 ## 4. Norm-Matched Causal Steering & The Control Asymmetry
 
-We implemented Norm-Matched Steering using vector scale alpha in {0.1, 0.25, 0.5, 1.0} times the mean residual norm (152.2 at L9, 184.3 at L12). Injecting unknown directions on known queries yields 0/30 refusal across all scales (Figure 2A). Conversely, steering unknown entities with known latents only suppresses refusal at alpha=1.0 (Figure 2B), where Diff-of-Means causes model collapse.
+We implemented Norm-Matched Steering using vector scale alpha in {0.1, 0.25, 0.5, 1.0} times the mean residual norm (152.2 at L9, 184.3 at L12). Injecting unknown directions on known queries yields 0/30 refusal (95% CI 0–11.6%) across all scales (Figure 2A). Conversely, steering unknown entities with known latents only suppresses refusal at alpha=1.0 (Figure 2B), where Diff-of-Means causes model collapse.
 
 (A) Known Entities + Unknown Direction — [Figure 2A]
 (B) Unknown Entities + Known Direction — [Figure 2B]
@@ -51,7 +51,7 @@ We implemented Norm-Matched Steering using vector scale alpha in {0.1, 0.25, 0.5
 
 ## 5. Multi-Latent Top-K Sweeps & Ensembling Dynamics
 
-To test whether single-latent interventions failed due to representational dispersion, we performed multi-latent sweeps with ensemble size k in {1, 3, 5, 10} across alpha in {0.25, 0.50, 1.00}. Multi-latent unknown steering still produced 0/30 refusal. On unknown queries, ensembling k in {3, 5, 10} latents reduced refusal variability (10–14/30) with no monotonic gain over k=1, consistent with partial mutual vector cancellation.
+To test whether single-latent interventions failed due to representational dispersion, we performed multi-latent sweeps with ensemble size k in {1, 3, 5, 10} across alpha in {0.25, 0.50, 1.00}. Multi-latent unknown steering still produced 0/30 refusal (95% CI 0–11.6%). On unknown queries, ensembling k in {3, 5, 10} latents reduced refusal variability (10–14/30) with no monotonic gain over k=1, consistent with partial mutual vector cancellation.
 
 | Configuration | Condition | k=1, r=0.5 | k=1, r=1.0 | k=3, r=1.0 | k=5, r=1.0 | k=10, r=1.0 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -103,7 +103,7 @@ A limitation of Gemma Scope is that all released SAEs were trained with a single
 3. **Multi-Latent Interference:** Ensembling top-k latents does not overcome refusal resistance and shows no monotonic dose-response.
 4. **Seed-Dependent Basis:** Detection capability is seed-invariant; the latent basis is not — consistent with Paulo & Belrose (2025).
 
-**Limitations.** Our audit uses one model (Gemma-2-2B-it), N=30 entities per class, and string-matched refusal scoring; steering was applied only at the final entity token and mid layers. Ferrando et al. (2025) observed their strongest effects at the final entity token and middle layers, but we cannot exclude that interventions at other positions or layers, or on different latents (e.g., selected by causal rather than separation scores), would succeed. The KV-cache resilience account remains a hypothesis supported by attribution evidence, not a proof.
+**Limitations.** (i) Our audit uses one model (Gemma-2-2B-it); replication in a second model is required before generalizing to small language models broadly. (ii) N=30 entities per class; 0/30 outcomes correspond to a 95% binomial CI of 0–11.6% and should be read as "very low", not exactly zero. (iii) Refusal was scored by a single string-matching procedure; a second independent scorer (LLM judge) was not used, so false negatives cannot be excluded. (iv) Steering was applied only at the final entity token and mid layers; interventions at other positions or layers, or on latents selected by causal rather than separation scores, were not tested, and no random-latent steering baseline was included. (v) At alpha=1.0, refusal suppression co-occurs with generation collapse, so the two cannot be fully disentangled with the present metrics. (vi) The KV-cache resilience account remains a hypothesis supported by attribution evidence, not a proof.
 
 ## Acknowledgements
 
@@ -122,7 +122,27 @@ The author thanks the autonomous LLM research assistant "L" for code development
 
 ## Appendix A — Entity Stimulus Lists
 
-[TODO: 30 known / 30 chimera / 30 synthetic-unknown athlete names, one per line]
+Template (to be filled from the experimental records):
+
+### A.1 Known entities (N=30)
+- 1. [known athlete 1]
+- 2. [known athlete 2]
+- ...
+- 30. [known athlete 30]
+
+### A.2 Chimera entities (N=30)
+Hybrid names: authentic first name + authentic surname of a different athlete.
+- 1. Kobe Williams
+- 2. Novak Zidane
+- 3. Stephen Ronaldo
+- ...
+- 30. [chimera athlete 30]
+
+### A.3 Synthetic unknown entities (N=30)
+- 1. Kasimir Lindqvist
+- 2. Orrin Vandermeer
+- ...
+- 30. [synthetic athlete 30]
 
 ## Appendix B — Sub-Threshold Query Perturbation
 
