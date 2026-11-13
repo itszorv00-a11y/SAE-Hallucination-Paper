@@ -138,6 +138,8 @@ t4.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.4, colors.grey),
                         ("VALIGN", (0, 0), (-1, -1), "TOP"),
                         ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)]))
 story.append(KeepTogether([t4, Spacer(1, 4), Paragraph("<b>Table 4:</b> Verbatim generation transcripts, illustrating total resistance on known queries and wild attribute borrowing on unknown queries.", CAP)]))
+story.append(Spacer(1, 4))
+story.append(Paragraph("<b>Figure provenance note.</b> Figures 1\u20133 were regenerated from the summary statistics reported in Tables 1\u20133; per-entity raw measurements are available in the experiment logs (experiments/results/). Figure 4 is pending regeneration from raw attribution data.", CAP))
 
 story.append(Paragraph("8. Key Takeaways &amp; Conclusion", H1))
 story.append(Paragraph("1. <b>Detection != Control:</b> High classification AUROC (&gt; 0.96) is orthogonal to causal steering efficacy for entity-recognition latents in this regime.", BODY))

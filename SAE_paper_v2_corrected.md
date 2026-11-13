@@ -96,6 +96,8 @@ A limitation of Gemma Scope is that all released SAEs were trained with a single
 
 **Table 4:** Verbatim generation transcripts, illustrating total resistance on known queries and wild attribute borrowing on unknown queries.
 
+**Figure provenance note.** Figures 1–3 were regenerated from the summary statistics reported in Tables 1–3; per-entity raw measurements are available in the experiment logs (`experiments/results/`). Figure 4 is pending regeneration from raw attribution data.
+
 ## 8. Key Takeaways & Conclusion
 
 1. **Detection != Control:** High classification AUROC (> 0.96) is orthogonal to causal steering efficacy for entity-recognition latents in this regime.
