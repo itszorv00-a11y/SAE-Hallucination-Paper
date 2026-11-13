@@ -18,6 +18,8 @@ Author: Md Mushfiqur Rahim (ORCID: 0009-0003-1021-685X)
 - [x] Theorem 1 reframed as Hypothesis 1
 - [x] AI-use disclosure added
 - [x] Phase 0 fixes: binomial CIs on 0/30 claims, systematic wording, honest code-release statement, expanded limitations, Appendix A template
+- [x] Full experiment suite written (`experiments/`, 6 scripts) — ready to run on GPU
+- [x] Appendix B derivation written into paper
 - [ ] Figure 4 (attribution heatmap + attention retention) — pending raw data regeneration
 - [ ] Appendix A — entity stimulus lists
 - [ ] Appendix B — sub-threshold query perturbation derivation
