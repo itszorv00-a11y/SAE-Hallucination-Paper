@@ -144,6 +144,33 @@ Hybrid names: authentic first name + authentic surname of a different athlete.
 - ...
 - 30. [synthetic athlete 30]
 
-## Appendix B — Sub-Threshold Query Perturbation
+## Appendix B — Sub-Threshold Query Perturbation (Derivation Sketch)
 
-[TODO: derivation sketch for the softmax key-margin inequality; define gamma (key margin), delta (perturbation bound), k (key vector norm)]
+**Setup.** Let h ∈ R^d be the residual stream at the query position, and let the entity token sit at context position e among N positions. Attention logits are z_i = (W_q h)·k_i / sqrt(d), with keys k_i fixed by the KV cache from earlier layers.
+
+**Definitions.**
+- gamma = z_e − max_{j≠e} z_j — the softmax key margin between the entity position and the best competitor.
+- delta = ||W_q||_2 · alpha · ||h|| — an upper bound on the query perturbation induced by an additive residual edit of scale alpha·||h|| (worst case over directions).
+- k_max = max_i ||k_i|| — the largest key norm in the context.
+
+**Step 1 (logit stability).** A residual perturbation Delta h with ||Delta h|| ≤ alpha·||h|| changes the query by Delta q = W_q Delta h, so ||Delta q|| ≤ delta. Each logit moves by at most |Delta z_i| ≤ ||Delta q||·||k_i||/sqrt(d) ≤ delta·k_max/sqrt(d).
+
+**Step 2 (worst-case margin).** After the perturbation, the margin satisfies
+
+> gamma' ≥ gamma − 2·delta·k_max / sqrt(d),
+
+since the entity logit can drop by delta·||k_e||/sqrt(d) while a competitor rises by delta·k_max/sqrt(d). This is the inequality stated in Hypothesis 1 (gamma > 2·delta·||k||).
+
+**Step 3 (attention retention).** By a union bound on the softmax denominator,
+
+> p_e = 1 / (1 + Σ_{j≠e} exp(z_j − z_e)) ≥ 1 / (1 + (N−1)·exp(−gamma')).
+
+Therefore p_e > 0.8 whenever gamma' > ln(4(N−1)).
+
+**Conclusion (sufficient condition).** If
+
+> gamma − 2·delta·k_max / sqrt(d) > ln(4(N−1)),
+
+then attention probability on the entity position remains above 0.8 despite the steering perturbation. With saturated factual-recall heads, gamma is empirically large (well above ln(4(N−1)) for typical context lengths), so norm-matched perturbations at the final entity token are sub-threshold — consistent with the observed attention retention > 0.80 at alpha = 1.0 (Figure 4B).
+
+**Caveat.** This is a sufficient-condition sketch for the retention phenomenon, not a proof that no steering protocol can succeed: it assumes additive, single-position edits and worst-case (adversarial) perturbation geometry; directionally targeted edits or multi-layer interventions are outside this bound.
